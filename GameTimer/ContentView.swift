@@ -72,7 +72,7 @@ struct ContentView: View {
                         Button(action: resetToStart) {
                             Text("X")
                                 .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.green.opacity(0.6))
+                                .foregroundColor(.gray.opacity(0.4))
                                 .frame(width: 44, height: 44)
                         }
                         .padding(.trailing, 20)

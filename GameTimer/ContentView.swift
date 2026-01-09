@@ -37,47 +37,58 @@ struct ContentView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                Color.black
-                    .ignoresSafeArea()
+        ZStack {
+            Color.black
+                .ignoresSafeArea()
 
-                if timerState == .ready {
-                    Button(action: startTimer) {
-                        Text("START")
-                            .font(.custom("Digital-7Mono", size: 80))
+            GeometryReader { geometry in
+                ZStack {
+                    if timerState == .ready {
+                        Button(action: startTimer) {
+                            Text("START")
+                                .font(.custom("Digital-7Mono", size: 80))
+                                .foregroundColor(.green)
+                        }
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                    } else if timerState == .finished {
+                        Text(timeString)
+                            .font(.custom("Digital-7Mono", size: fontSize(for: geometry)))
                             .foregroundColor(.green)
+                            .opacity(flashVisible ? 1.0 : 0.0)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                resetToStart()
+                            }
+                    } else {
+                        Text(timeString)
+                            .font(.custom("Digital-7Mono", size: fontSize(for: geometry)))
+                            .foregroundColor(.green)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                togglePause()
+                            }
                     }
-                } else if timerState == .finished {
-                    Text(timeString)
-                        .font(.custom("Digital-7Mono", size: fontSize(for: geometry)))
-                        .foregroundColor(.green)
-                        .opacity(flashVisible ? 1.0 : 0.0)
-                        .onTapGesture {
-                            resetToStart()
-                        }
-                } else {
-                    Text(timeString)
-                        .font(.custom("Digital-7Mono", size: fontSize(for: geometry)))
-                        .foregroundColor(.green)
-                        .onTapGesture {
-                            togglePause()
-                        }
                 }
-
             }
-            .frame(width: geometry.size.width, height: geometry.size.height)
-        }
-        .overlay(alignment: .topTrailing) {
+
+            // Reset button in top-right corner when paused
             if timerState == .paused {
-                Button(action: resetToStart) {
-                    Text("X")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundColor(.gray.opacity(0.4))
-                        .frame(width: 44, height: 44)
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button(action: resetToStart) {
+                            Text("X")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.gray.opacity(0.4))
+                                .frame(width: 44, height: 44)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.top, 10)
+                    }
+                    Spacer()
                 }
-                .padding(.trailing, 20)
-                .padding(.top, 10)
             }
         }
     }

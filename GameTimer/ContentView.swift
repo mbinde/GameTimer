@@ -37,32 +37,33 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack {
-            Color.black
-                .ignoresSafeArea()
+        GeometryReader { geometry in
+            ZStack {
+                Color.black
+                    .ignoresSafeArea()
 
-            if timerState == .ready {
-                Button(action: startTimer) {
-                    Text("START")
-                        .font(.custom("Digital-7Mono", size: 80))
+                if timerState == .ready {
+                    Button(action: startTimer) {
+                        Text("START")
+                            .font(.custom("Digital-7Mono", size: 80))
+                            .foregroundColor(.green)
+                    }
+                } else if timerState == .finished {
+                    Text(timeString)
+                        .font(.custom("Digital-7Mono", size: fontSize(for: geometry)))
                         .foregroundColor(.green)
+                        .opacity(flashVisible ? 1.0 : 0.0)
+                        .onTapGesture {
+                            resetToStart()
+                        }
+                } else {
+                    Text(timeString)
+                        .font(.custom("Digital-7Mono", size: fontSize(for: geometry)))
+                        .foregroundColor(.green)
+                        .onTapGesture {
+                            togglePause()
+                        }
                 }
-            } else if timerState == .finished {
-                Text(timeString)
-                    .font(.custom("Digital-7Mono", size: 120))
-                    .foregroundColor(.green)
-                    .opacity(flashVisible ? 1.0 : 0.0)
-                    .onTapGesture {
-                        resetToStart()
-                    }
-            } else {
-                Text(timeString)
-                    .font(.custom("Digital-7Mono", size: 120))
-                    .foregroundColor(.green)
-                    .onTapGesture {
-                        togglePause()
-                    }
-            }
 
             // Reset button in top-right corner when paused
             if timerState == .paused {
@@ -81,7 +82,16 @@ struct ContentView: View {
                     Spacer()
                 }
             }
+            }
         }
+    }
+
+    func fontSize(for geometry: GeometryProxy) -> CGFloat {
+        // "00:00" has 5 characters; Digital-7 Mono is roughly 0.6x width-to-height ratio
+        // Target 75% of screen width
+        let targetWidth = geometry.size.width * 0.75
+        let charactersWidth = 5.0 * 0.6 // 5 chars, each ~0.6 of font size wide
+        return targetWidth / charactersWidth
     }
 
     func startTimer() {

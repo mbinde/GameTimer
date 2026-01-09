@@ -7,12 +7,15 @@ struct ContentView: View {
     @State private var timer: Timer?
     @State private var audioPlayer: AVAudioPlayer?
     @State private var audioDelegate: AudioDelegate?
+    @State private var flashVisible: Bool = true
+    @State private var flashTimer: Timer?
 
     enum TimerState {
         case ready
         case starting // playing start sound
         case running
         case paused
+        case finished // playing end sound, 0:00 flashing
     }
 
     class AudioDelegate: NSObject, AVAudioPlayerDelegate {
@@ -44,6 +47,14 @@ struct ContentView: View {
                         .font(.custom("Digital-7Mono", size: 80))
                         .foregroundColor(.green)
                 }
+            } else if timerState == .finished {
+                Text(timeString)
+                    .font(.custom("Digital-7Mono", size: 120))
+                    .foregroundColor(.green)
+                    .opacity(flashVisible ? 1.0 : 0.0)
+                    .onTapGesture {
+                        resetToStart()
+                    }
             } else {
                 Text(timeString)
                     .font(.custom("Digital-7Mono", size: 120))
@@ -51,6 +62,24 @@ struct ContentView: View {
                     .onTapGesture {
                         togglePause()
                     }
+            }
+
+            // Reset button in top-right corner when paused
+            if timerState == .paused {
+                VStack {
+                    HStack {
+                        Spacer()
+                        Button(action: resetToStart) {
+                            Text("X")
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.green.opacity(0.6))
+                                .frame(width: 44, height: 44)
+                        }
+                        .padding(.trailing, 20)
+                        .padding(.top, 20)
+                    }
+                    Spacer()
+                }
             }
         }
     }
@@ -89,10 +118,24 @@ struct ContentView: View {
 
     func timerFinished() {
         timer?.invalidate()
-        playSound(named: "end") {
-            self.timerState = .ready
-            self.remainingSeconds = 600
+        timerState = .finished
+        flashVisible = true
+
+        // Start flashing 0:00
+        flashTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            flashVisible.toggle()
         }
+
+        playSound(named: "end") {}
+    }
+
+    func resetToStart() {
+        timer?.invalidate()
+        flashTimer?.invalidate()
+        audioPlayer?.stop()
+        timerState = .ready
+        remainingSeconds = 600
+        flashVisible = true
     }
 
     func playSound(named name: String, onFinished: @escaping () -> Void = {}) {

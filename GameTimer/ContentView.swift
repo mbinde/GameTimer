@@ -65,23 +65,23 @@ struct ContentView: View {
                         }
                 }
 
-            // Reset button in top-right corner when paused
-            if timerState == .paused {
-                VStack {
-                    HStack {
-                        Spacer()
-                        Button(action: resetToStart) {
-                            Text("X")
-                                .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.gray.opacity(0.4))
-                                .frame(width: 44, height: 44)
+                // Reset button in top-right corner when paused
+                if timerState == .paused {
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Button(action: resetToStart) {
+                                Text("X")
+                                    .font(.system(size: 24, weight: .bold))
+                                    .foregroundColor(.gray.opacity(0.4))
+                                    .frame(width: 44, height: 44)
+                            }
+                            .padding(.trailing, 20)
                         }
-                        .padding(.trailing, 20)
-                        .padding(.top, 20)
+                        Spacer()
                     }
-                    Spacer()
+                    .frame(width: geometry.size.width, height: geometry.size.height)
                 }
-            }
             }
         }
     }

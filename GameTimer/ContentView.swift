@@ -152,6 +152,10 @@ struct ContentView: View {
         if let path = Bundle.main.path(forResource: name, ofType: "mp3") {
             let url = URL(fileURLWithPath: path)
             do {
+                // Configure audio session to play even when silent switch is on
+                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+                try AVAudioSession.sharedInstance().setActive(true)
+
                 audioPlayer = try AVAudioPlayer(contentsOf: url)
                 audioDelegate = AudioDelegate(onFinished: onFinished)
                 audioPlayer?.delegate = audioDelegate

@@ -74,7 +74,7 @@ struct ContentView: View {
             }
 
             // Reset button in top-right corner when timer is active
-            if timerState == .running || timerState == .paused {
+            if timerState == .starting || timerState == .running || timerState == .paused {
                 VStack {
                     HStack {
                         Spacer()
